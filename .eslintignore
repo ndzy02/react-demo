@@ -1,0 +1,9 @@
+!.*.js
+~*
+typings
+node_modules
+dist
+coverage
+**/*.d.ts
+# Scripts
+jest-stare

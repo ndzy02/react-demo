@@ -1,0 +1,12 @@
+# 需要忽略的文件(可后续添加)
+**/*.ico
+.husky
+*.sh
+.editorconfig
+.eslintignore
+.gitignore
+.prettierignore
+.prettierrc
+package.json
+yarn.lock
+
