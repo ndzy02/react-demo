@@ -1,21 +1,23 @@
+const path = require('path');
 const {
-  useBabelRc: babelConfig,
+  useBabelRc,
   override,
   addWebpackAlias,
   addWebpackPlugin,
   setWebpackOptimizationSplitChunks,
 } = require('customize-cra');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const path = require('path');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const eslintConfig = require('./.eslintrc.js');
 
-const alias = {
+//
+const env = process.env.NODE_ENV;
+const aliasConfig = {
   '@': path.resolve(__dirname, 'src'),
   assets: path.resolve(__dirname, 'src/assets'),
   components: path.resolve(__dirname, 'src/components'),
 };
-const webpackOptimizationSplitChunks = {
+const splitChunksConfig = {
   chunks: 'all', // 默认作用于异步chunk，值为all/initial/async
   minSize: 30000, // 默认值是30kb,代码块的最小尺寸
   maxSize: 30000,
@@ -46,8 +48,13 @@ const styleLintConfig = {
   quiet: true,
   fix: true, // 修复不规范的样式代码
 };
-
-const eslintConfigFun = configRules => config => {
+const devConfig = { eslint: eslintConfig };
+const prodConfig = {};
+/**
+ * @description 配置 eslint
+ * @param configRules
+ */
+const useEslintRc = configRules => config => {
   config.module.rules = config.module.rules.map(rule => {
     // Only target rules that have defined a `useEslintrc` parameter in their options
     if (rule.use && rule.use.some(use => use.options && use.options.useEslintrc !== void 0)) {
@@ -65,23 +72,35 @@ const eslintConfigFun = configRules => config => {
     }
     return rule;
   });
+};
+
+/**
+ * @description 自定义配置
+ * @param configRules 自定义配置  config override 传递的配置
+ */
+const useRc = configRules => config => {
+  const { dev, prod } = configRules;
+  if (env === 'development') {
+    useEslintRc(dev.eslint);
+  }
+  if (env === 'production') {
+    console.log(prod);
+  }
   return config;
 };
 
-// node 运行环境
-const env = process.env.NODE_ENV;
 const envs = {
   development: override(
-    eslintConfigFun(eslintConfig),
-    babelConfig(),
-    addWebpackAlias(alias),
+    useRc({ dev: devConfig, prod: prodConfig }),
+    useBabelRc(),
+    addWebpackAlias(aliasConfig),
     addWebpackPlugin(new StyleLintPlugin(styleLintConfig)),
   ),
-
   production: override(
-    babelConfig(),
-    addWebpackAlias(alias),
-    setWebpackOptimizationSplitChunks(webpackOptimizationSplitChunks),
+    useRc({ dev: devConfig, prod: prodConfig }),
+    useBabelRc(),
+    addWebpackAlias(aliasConfig),
+    setWebpackOptimizationSplitChunks(splitChunksConfig),
     addWebpackPlugin(new BundleAnalyzerPlugin()),
   ),
 };

@@ -3,6 +3,7 @@ build
 dist
 node_modules
 public
+coverage
 config-overrides.js
 !.*.js
 **/*.d.ts
