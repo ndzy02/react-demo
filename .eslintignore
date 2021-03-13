@@ -1,9 +1,8 @@
-!.*.js
-~*
-typings
-node_modules
+.husky
+build
 dist
-coverage
+node_modules
+public
+config-overrides.js
+!.*.js
 **/*.d.ts
-# Scripts
-jest-stare
