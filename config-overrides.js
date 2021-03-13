@@ -10,7 +10,6 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const eslintConfig = require('./.eslintrc.js');
 
-//
 const env = process.env.NODE_ENV;
 const aliasConfig = {
   '@': path.resolve(__dirname, 'src'),
@@ -49,30 +48,7 @@ const styleLintConfig = {
   fix: true, // 修复不规范的样式代码
 };
 const devConfig = { eslint: eslintConfig };
-const prodConfig = {};
-/**
- * @description 配置 eslint
- * @param configRules
- */
-const useEslintRc = configRules => config => {
-  config.module.rules = config.module.rules.map(rule => {
-    // Only target rules that have defined a `useEslintrc` parameter in their options
-    if (rule.use && rule.use.some(use => use.options && use.options.useEslintrc !== void 0)) {
-      const ruleUse = rule.use[0];
-      const baseOptions = ruleUse.options;
-      const baseConfig = baseOptions.baseConfig || {};
-      ruleUse.options = {
-        useEslintrc: false,
-        ignore: true,
-        baseConfig: { ...baseConfig, ...configRules },
-      };
-      return rule;
-
-      // Rule not using eslint. Do not modify.
-    }
-    return rule;
-  });
-};
+const prodConfig = { shouldUseSourceMap: false };
 
 /**
  * @description 自定义配置
@@ -81,27 +57,54 @@ const useEslintRc = configRules => config => {
 const useRc = configRules => config => {
   const { dev, prod } = configRules;
   if (env === 'development') {
-    useEslintRc(dev.eslint);
+    // eslint 配置
+    config.module.rules = config.module.rules.map(rule => {
+      // Only target rules that have defined a `useEslintrc` parameter in their options
+      if (rule.use && rule.use.some(use => use.options && use.options.useEslintrc !== void 0)) {
+        const ruleUse = rule.use[0];
+        const baseOptions = ruleUse.options;
+        const baseConfig = baseOptions.baseConfig || {};
+        ruleUse.options = {
+          useEslintrc: false,
+          ignore: true,
+          baseConfig: { ...baseConfig, ...dev.eslint },
+        };
+        return rule;
+
+        // Rule not using eslint. Do not modify.
+      }
+      return rule;
+    });
   }
   if (env === 'production') {
-    console.log(prod);
+    // 隐藏源码
+    config.devtool = prod.shouldUseSourceMap;
+    config.optimization.minimizer = config.optimization.minimizer.map((_, index) => {
+      if (index === 0) {
+        _.options.sourceMap = prod.shouldUseSourceMap;
+      }
+      if (index === 1) {
+        _.options.cssProcessorOptions.map = prod.shouldUseSourceMap;
+      }
+      return _;
+    });
   }
   return config;
 };
 
 const envs = {
   development: override(
-    useRc({ dev: devConfig, prod: prodConfig }),
     useBabelRc(),
     addWebpackAlias(aliasConfig),
     addWebpackPlugin(new StyleLintPlugin(styleLintConfig)),
+    useRc({ dev: devConfig, prod: prodConfig }),
   ),
   production: override(
-    useRc({ dev: devConfig, prod: prodConfig }),
     useBabelRc(),
     addWebpackAlias(aliasConfig),
     setWebpackOptimizationSplitChunks(splitChunksConfig),
     addWebpackPlugin(new BundleAnalyzerPlugin()),
+    useRc({ dev: devConfig, prod: prodConfig }),
   ),
 };
 
