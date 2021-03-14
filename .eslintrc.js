@@ -54,10 +54,10 @@ module.exports = {
     'no-shadow': 0, // 禁止变量声明覆盖外层作用域的变量
     'no-undef': 0, // 禁用未声明的变量
     //------------
-    'react/no-access-state-in-setstate': 0,
-    'react/no-multi-comp': 0,
-    'react/no-array-index-key': 0,
-    'react/no-find-dom-node': 0,
+    'react/no-access-state-in-setstate': 0, // 防止在 this.setState 中使用 this.state 正确方式 this.setState(prevState => ({value: prevState.value + 1}));
+    'react/no-multi-comp': 0, // 防止每个文件定义多个组件
+    'react/no-array-index-key': 0, // 防止在键中使用数组索引
+    'react/no-find-dom-node': 0, // 防止使用 findDOMNode
     'react/no-unused-prop-types': 0,
     'react/default-props-match-prop-types': 0,
     'react/jsx-one-expression-per-line': 0,
