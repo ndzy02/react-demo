@@ -15,6 +15,7 @@ module.exports = {
         'style',
         'revert',
         'test',
+        'build', // 构建相关
       ],
     ],
     'type-case': [0],

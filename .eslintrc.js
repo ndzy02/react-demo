@@ -9,8 +9,8 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:markdown/recommended',
   ],
-  parser: '@typescript-eslint/parser',
   plugins: ['react', 'babel', 'jest', '@typescript-eslint', 'react-hooks', 'unicorn', 'markdown'],
+  parser: '@typescript-eslint/parser',
   env: {
     browser: true,
     node: true,
