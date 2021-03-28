@@ -1,4 +1,5 @@
 module.exports = {
+  // eslint-config-airbnb 继承规则 recommended 建议
   extends: [
     'airbnb',
     'react-app',
@@ -9,6 +10,7 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:markdown/recommended',
   ],
+  // 使用所有规则 recommended 建议
   plugins: ['react', 'babel', 'jest', '@typescript-eslint', 'react-hooks', 'unicorn', 'markdown'],
   parser: '@typescript-eslint/parser',
   env: {
